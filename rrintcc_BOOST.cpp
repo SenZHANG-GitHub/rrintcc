@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
 	vector<string> snpname;
 
 	vector<int> sA, sB; // Use vector<int> rather than vector<bool> to speed up
-	vector<double> combinedPvalues;
+	double pmin;
 
 	int n, p, ncase, nctrl;;  // n: number of samples; p: number of varibles
 	
@@ -133,11 +133,10 @@ int main(int argc, char* argv[])
 		// load .set data: Write sA, sB, and skip_symm inside
 		sA.clear();
 		sB.clear();
-		skip_symm = false; // Need to reset skip_symm, sA, sB, and combinedPvalues!!!
+		skip_symm = false; // Need to reset skip_symm, sA, sB!!!
 		GetSetInfo(setname, snpname, sA, sB, skip_symm, set_test, p);
 
-		combinedPvalues.clear();
-		combinedPvalues = CalcRegionInter(R, fout, pheno, geno, geno_bar, snpchr, snpname, skip_symm, p, n, ncase, nctrl, sA, sB, myth_pgates, myth_trun, reps, flagperm, max_cov_cnt);
+		pmin = CalcRegionInter(R, fout, pheno, geno, geno_bar, snpchr, snpname, skip_symm, p, n, ncase, nctrl, sA, sB, myth_pgates, myth_trun, reps, flagperm, max_cov_cnt);
 
 		// ofstream::app: Appending to the last line of current file
 		// ios::out: Rewrite current file (See utility.cpp) 
@@ -146,13 +145,7 @@ int main(int argc, char* argv[])
 		EPI.precision(4);
 		EPI << setw(8)  << "Pair " << to_string(i+1) << " | " 
 			<< setw(8)  << "pmin: " << " "
-			<< setw(15) << combinedPvalues[0] << " | "
-			<< setw(8)  << "pgates: " << " "
-			<< setw(15) << combinedPvalues[1] << " | "
-			<< setw(8)  << "ptts: " << " "
-			<< setw(15) << combinedPvalues[2] << " | "
-			<< setw(8)  << "ptprod: " << " "
-			<< setw(15) << combinedPvalues[3] << "\n";
+			<< setw(15) << pmin << "\n";
 		EPI.flush();
 		EPI.close();
 

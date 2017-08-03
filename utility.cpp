@@ -2,32 +2,6 @@
 
 extern ofstream LOG;
 
-// sort_indexes: used in CombinePValues()
-template <typename T>
-vector<int> sort_indexes(const vector<T> &v) {
-
-	// initialize original index locations
-	vector<int> idx(v.size());
-	iota(idx.begin(), idx.end(), 0);
-
-	// sort indexes based on comparing values in v
-	sort(idx.begin(), idx.end(),
-		[&v](int i1, int i2) {return v[i1] < v[i2]; });
-
-	return idx;
-}
-
-int CountSig(vector<double> &vec_p, double alpha)
-{
-	int nsig = 0;
-	for (vector<double>::iterator pval=vec_p.begin(); pval != vec_p.end(); pval++)
-	{
-		if (*pval <= alpha)
-			nsig++;
-	}
-	return nsig;
-}
-
 void printLOG(string s)
 {
 	LOG << s;
@@ -41,26 +15,11 @@ string int2str(int n)
 	return s2.str();
 }
 
-string dbl2str(double n, int prc)
-{
-	ostringstream s2;
-	if (prc > 0)
-		s2.precision(prc);
-	s2 << n;
-	return s2.str();
-}
-
 string char2str(char *f)
 {
 	ostringstream s2;
 	s2 << f;
 	return s2.str();
-}
-
-
-double Abs(double a)
-{
-	return((a<0) ? -a : a);
 }
 
 void GetSnpInfo(char *filename, vector<int> &snpchr, vector<string> &snpname)
@@ -503,7 +462,7 @@ From mapname: E.g. "example_bt_tag.map"
 //////////////////////////////////////////////////////////////////////
 // vector<double> [0]: pgates; [1]: ptts; [2]: ptprod
 
-vector<double> CalcRegionInter(RInside &R, string fout, vector<bool> &pheno, BYTE **geno, double **geno_bar, vector<int> &snpchr, vector<string> &snpname, bool skip_symm, int p, int n, int ncase, int nctrl, vector<int> &sA, vector<int> &sB, double myth_pgates, double myth_trun, int reps, bool flagperm, int max_cov_cnt)
+double CalcRegionInter(RInside &R, string fout, vector<bool> &pheno, BYTE **geno, double **geno_bar, vector<int> &snpchr, vector<string> &snpname, bool skip_symm, int p, int n, int ncase, int nctrl, vector<int> &sA, vector<int> &sB, double myth_pgates, double myth_trun, int reps, bool flagperm, int max_cov_cnt)
 {
 
 	// Take a list of SNPs, or all SNPs 
@@ -718,99 +677,12 @@ vector<double> CalcRegionInter(RInside &R, string fout, vector<bool> &pheno, BYT
 	
 	EPI.close();
 
-	// Calc pmin
+	// Calc and return pmin
 	R["numpv"] = plist.size();
 	R["cori"] = corr_matrix;
 	R["minpv"] = *min_element(plist.begin(), plist.end());
 
-	double pmin = R.parseEval("1-pmvnorm(lower=qnorm(minpv/2),upper=-qnorm(minpv/2),mean=rep(0, numpv),corr=cori)");
-
-	//printf("The pmin calculated via RInside: %.6f\n", pmin);
-
-
-	// Calc pgates
-	double pgates = CalcPgates(plist, corr_matrix, myth_pgates);
-
-	// Calc ptts and ptprod
-	double ptts = -99;
-	double ptprod = -99;
-	if (flagperm)
-	{
-		vector<double> permResults = CalcPerm(reps, pheno, zlist, plist, geno, geno_bar, sA, sB, skip_symm, p, n, ncase, nctrl, myth_trun);
-
-		ptts = permResults[0];
-		ptprod = permResults[1];
-	}
-
-	vector<double> output;
-	output.push_back(pmin);
-	output.push_back(pgates);
-	output.push_back(ptts);
-	output.push_back(ptprod);
-	return output;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// Functions for CalcPerm()
-double mytts(vector<double> plist, double myth)
-{
-	sort(plist.begin(), plist.end());
-	double ttssum = 0;
-	int i = 1;
-	for (vector<double>::iterator pval = plist.begin(); pval != plist.end(); pval++)
-	{
-		if(*pval < myth)
-			ttssum += 1-(*pval)*(plist.size()+1)/double(i);
-		i++;
-	}
-	ttssum = ttssum/double(plist.size());
-	return ttssum;
-}
-
-double mytprod_logsum(vector<double> plist, double myth)
-{
-	// Sort the local copy of plist
-	sort(plist.begin(), plist.end());
-	double logsum = 0;
-	for (vector<double>::iterator pval = plist.begin(); pval != plist.end(); pval++)
-	{
-		if(*pval < myth)
-			logsum += log(*pval);
-	}
-	return logsum;
-}
-///////////////////////////////////////////////////////////////////////////////
-// vector<double> [0]: ptts; [1]: ptprod;
-vector<double> CalcPerm(int reps, vector<bool> &pheno, vector<double> &zlist, vector<double> &plist, BYTE **geno, double **geno_bar, vector<int> &sA, vector<int> &sB, bool skip_symm, int p, int n, int ncase, int nctrl, double myth_trun)
-{
-	vector<bool> pheno_perm(pheno);
-	vector<double> zlist_perm, plist_perm;
-	vector<int> cov_index_perm;
-	vector<double> output;
-	int ntts, ntprod;
-
-	double ori_tts = mytts(plist, myth_trun);
-	double ori_logsum = mytprod_logsum(plist, myth_trun);
-	ntts = ntprod = 0;
-
-	for(int i = 0; i < reps; i++)
-	{
-		random_shuffle(pheno_perm.begin(), pheno_perm.end());
-		LDContrastTest(pheno_perm, zlist_perm, plist_perm, cov_index_perm, geno, geno_bar, sA, sB, skip_symm, p, n, ncase, nctrl);
-		/////////////////////////////////////////////////////////
-		// Add codes to deal with zlist_perm, plist_perm, and calculate updata ntts and ntprod
-		if (mytts(plist_perm, myth_trun) > ori_tts)
-			ntts++;
-		if (mytprod_logsum(plist_perm, myth_trun) < ori_logsum)
-			ntprod++; 
-		/////////////////////////////////////////////////////////
-	}
-
-	// Append ptts
-	output.push_back(ntts/double(reps));
- 	// Append ptprod
-	output.push_back(ntprod/double(reps));
-	return output;
+	return R.parseEval("1-pmvnorm(lower=qnorm(minpv/2),upper=-qnorm(minpv/2),mean=rep(0, numpv),corr=cori)");
 
 }
 
@@ -882,46 +754,3 @@ void LDContrastTest(vector<bool> &pheno, vector<double> &zlist, vector<double> &
 		} // end if(sA[e1])
 	} // end e1
 }
-
-// Calc pgates directly, and ptts and ptprod by permutations
-double CalcPgates(vector<double> &plist, Rcpp::NumericMatrix &corr_matrix, double myth_pgates)
-{
-	int num_pv = plist.size();
-	double me, pgates;
-	vector<double> ptemp;
-	vector<double> keff;
-	vector<int> myo;
-
-
-	// Calc pgates
-	ptemp.resize(num_pv);
-	keff.resize(num_pv);
-	myo = sort_indexes(plist);
-	keff[0] = 1;
-
-	for (int i = 1; i < num_pv; i++)
-	{
-		vector<double> corr_myo;
-		for (int j = 0; j < i; j++)
-			corr_myo.push_back(corr_matrix(myo[i], myo[j]));
-
-		double r = abs(*max_element(corr_myo.begin(), corr_myo.begin() + i, [](double i, double j) {return abs(i) < abs(j); }));
-		keff[i] = sqrt(1-pow(r, -1.31*log10(myth_pgates)));
-
-		//printf("keff[%d]: %f\n", i+1, keff[i]);
-	}
-	
-	me = accumulate(keff.begin(), keff.end(), 0.0); // Use 0.0 rather than 0 !!!
-
-	//printf("me: %f\n", me);
-
-	for (int i = 0; i < num_pv; i++)
-	{
-		ptemp[i] = me*plist[myo[i]]/double(keff[i]);
-	}
-
-	pgates = *min_element(ptemp.begin(), ptemp.end());
-	return pgates;
-
-}
-
