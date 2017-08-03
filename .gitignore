@@ -1,0 +1,6 @@
+Data/*
+Results/*
+Results_R/*
+rrintcc_BOOST
+rrintcc_BOOST.log
+*.o
