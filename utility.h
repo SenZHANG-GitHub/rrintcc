@@ -47,30 +47,20 @@ void printLOG(string s);
 
 string int2str(int n);
 
-string dbl2str(double n, int prc);
-
 string char2str(char *f);
 
-double Abs(double a);
+void GetFileNames(char* cfname, string &foutpath, string &resname, string &logname, string &filename, string &mapname, string &setpath, string &setname);
 
-void sizeMatrix(vector<vector<double> > &m, int r, int c);
+void GetSnpInfo(string filename, vector<int> &snpchr, vector<string> &snpname);
 
-void GetSnpInfo(char *filename, vector<int> &snpchr, vector<string> &snpname);
+void GetSetInfo(string setname, vector<string> &snpname, vector<int> &sA, vector<int> &sB, bool &skip_symm, bool set_test, int p);
 
-void GetSetInfo(char *setname, vector<string> &snpname, vector<int> &sA, vector<int> &sB, bool &skip_symm, bool set_test, int p);
+void GetDataSize(string filename, int **DataSize, int &ndataset_out);
 
-void GetDataSize(char *filename, int **DataSize, int &ndataset_out);
+void GetData(string filename, int *DataSize, int &n, int &p, int &ncase, int &nctrl, int ndataset, vector<bool> &pheno, BYTE ***geno, double ***geno_bar);
 
-void GetData(char *filename, int *DataSize, int &n, int &p, int &ncase, int &nctrl, int ndataset, vector<bool> &pheno, BYTE ***geno, double ***geno_bar);
-
-vector<double> CalcRegionInter(RInside &R, string fout, vector<bool> &pheno, BYTE **geno, double **geno_bar, vector<int> &snpchr, vector<string> &snpname, bool skip_symm, int p, int n, int ncase, int nctrl, vector<int> &sA, vector<int> &sB, double myth_pgates, double myth_trun, int reps, bool flagperm, int max_cov_cnt);
-
-double CalcPgates(vector<double> &plist, Rcpp::NumericMatrix &corr_matrix, double myth_pgates);
+double CalcRegionInter(RInside &R, string fout, vector<bool> &pheno, BYTE **geno, double **geno_bar, vector<int> &snpchr, vector<string> &snpname, bool skip_symm, int p, int n, int ncase, int nctrl, vector<int> &sA, vector<int> &sB, double myth_pgates, double myth_trun, int reps, bool flagperm, int max_cov_cnt);
 
 void LDContrastTest(vector<bool> &pheno, vector<double> &zlist, vector<double> &plist, vector<int> &cov_index, BYTE **geno, double **geno_bar, vector<int> &sA, vector<int> &sB, bool skip_symm, int p, int n, int ncase, int nctrl);
-
-vector<double> CalcPerm(int reps, vector<bool> &pheno, vector<double> &zlist, vector<double> &plist, BYTE **geno, double **geno_bar, vector<int> &sA, vector<int> &sB, bool skip_symm, int p, int n, int ncase, int nctrl, double myth_trun);
-
-int CountSig(vector<double> &vec_p, double alpha);
 
 #endif

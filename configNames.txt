@@ -1,0 +1,27 @@
+#################################################################
+# Formats for configNames.txt
+# '#' can be used in the front of a line to comment this line
+# Empty lines are permited in this file
+# The filenames need not be ordered
+# There should be two words per line
+# The two words should be separated by spaces or tabs
+# The first word in a line is the variable name in rrintcc
+# The second word in a line is the content for this variable 
+# Variables that need to be specified in this file:
+# foutpath, resname, logname, filename, mapname, setpath, setname
+#################################################################
+
+foutpath    Results/snp_results/
+resname	    Results/region_pair_results.txt
+logname	    Results/rrintcc_BOOST.log
+
+filename    Data/filenamelist.txt
+mapname	    Data/example_bt_tag.map
+setname	    Data/example_bt_tag.set
+
+# Format of .set/.snps names: locipair1/2/.../.set/snp
+setpath	    all_sets/
+
+# mapname    CUHK_HKDRGWA_6445CC_Clean_Ch1-22.map
+
+#################################################################
