@@ -22,6 +22,101 @@ string char2str(char *f)
 	return s2.str();
 }
 
+void GetFileNames(char* cfname, string &foutpath, string &resname, string &logname, string &filename, string &mapname, string &setpath, string &setname)
+{
+	// Should not use printLOG cuz logname is not yet ready
+	if (cfname == NULL) {
+		fprintf(stderr,"err: no configuration txt is specified in argv[1]\n");
+		//printLOG("err: no configuration txt is specified in argv[1]\n");
+	}
+
+	printf("file for filename configuration: %s\n", cfname);
+	//printLOG("file for filename configuration: " + char2str(cfname) + "\n");
+
+	ifstream fp(cfname);
+	string line;
+	if (fp.is_open()) {
+		while(getline(fp, line)) {
+			if (line.back() == '\r')
+				line.erase(line.length()-1);
+
+			// configNames.txt can use # to comment a line
+			if (line.empty() || line[0] == '#') 
+				continue;
+
+			istringstream iss(line); 
+			string id;
+			iss >> id;
+			
+			if (id == "foutpath")
+				iss >> foutpath;
+
+			if (id == "resname")
+				iss >> resname;
+
+			if (id == "logname")
+				iss >> logname;
+
+			if (id == "filename")
+				iss >> filename;
+
+			if (id == "mapname")
+				iss >> mapname;
+
+			if (id == "setpath")
+				iss >> setpath;
+
+			if (id == "setname")
+				iss >> setname;
+
+		}
+	} else {
+		fprintf(stderr, "can't open file: %s\n", cfname);
+		//printLOG("can't open file: " + char2str(cfname) + "\n");
+		exit(1);
+	}
+
+	if (foutpath.empty()) {
+		fprintf(stderr, "\"foutpath\" is missing in %s\n", cfname);
+		//printLOG("\"foutpath\" is missing in " + char2str(cfname) + "\n");
+		exit(1);
+	}
+	if (resname.empty()) {
+		fprintf(stderr, "\"resname\" is missing in %s\n", cfname);
+		//printLOG("\"resname\" is missing in " + char2str(cfname) + "\n");
+		exit(1);
+	}
+	if (logname.empty()) {
+		fprintf(stderr, "\"logname\" is missing in %s\n", cfname);
+		//printLOG("\"logname\" is missing in " + char2str(cfname) + "\n");
+		exit(1);
+	}
+	if (filename.empty()) {
+		fprintf(stderr, "\"filename\" is missing in %s\n", cfname);
+		//printLOG("\"filename\" is missing in " + char2str(cfname) + "\n");
+		exit(1);
+	}
+	if (mapname.empty()) {
+		fprintf(stderr, "\"mapname\" is missing in %s\n", cfname);
+		//printLOG("\"mapname\" is missing in " + char2str(cfname) + "\n");
+		exit(1);
+	}
+	if (setpath.empty()) {
+		fprintf(stderr, "\"setpath\" is missing in %s\n", cfname);
+		//printLOG("\"setpath\" is missing in " + char2str(cfname) + "\n");
+		exit(1);
+	}
+	if (setname.empty()) {
+		fprintf(stderr, "\"setname\" is missing in %s\n", cfname);
+		//printLOG("\"setname\" is missing in " + char2str(cfname) + "\n");
+		exit(1);
+	}
+
+	//printf("successfully read %s for file names\n", cfname);
+	//printLOG("successfully read " + char2str(cfname) + " for file names\n");
+}
+
+
 void GetSnpInfo(string filename, vector<int> &snpchr, vector<string> &snpname)
 {
 	string line;

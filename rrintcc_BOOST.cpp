@@ -29,17 +29,8 @@ int main(int argc, char* argv[])
 {
 	/* Declare variable */
 	int    numSets 		 = 1;
-	string foutpath      = "Results/snp_results/";
-	string resname 		 = "Results/region_pair_results.txt";
-	string logname 		 = "Results/rrintcc_BOOST.log";
-
-	string filename	 = "Data/filenamelist.txt";
-	//char mapname[100] 	 = "CUHK_HKDRGWA_6445CC_Clean_Ch1-22.map";
-	string mapname	 = "Data/example_bt_tag.map";
-
-	string setpath	 = "all_sets/"; // Format of .set/.snps names: locipair1/2/.../.set/snp
-
-	cout << "Use all strings successfully" << endl;
+	string foutpath, resname, logname;
+	string filename, mapname, setpath, setname;
 
 	// Used for set-set interaction tests
     // Warning: Should not be changed!!!
@@ -52,7 +43,6 @@ int main(int argc, char* argv[])
 	int    reps 	     = 1000;   // How many permutations will be performed if flagperm = true
 	bool   flagperm 	 = false;  // whether do permutations for ptts and ptprod or not 
     int    max_cov_cnt   = 20000;   // default: 1000 (means the cov matrix is at most 1000*1000)
-
 
 	int *DataSize;
 	int ndataset;
@@ -74,13 +64,22 @@ int main(int argc, char* argv[])
 	RInside R(argc, argv);
 	R.parseEvalQ("library(mvtnorm); library(corpcor)");
 	
+	clock_t st, ed;
+
+	/////////////////////////////////////////////////////
+	// Calc file names
+	printf("-----------------------------------------\n");
+	printf("start getting the file names...\n");
+	st = clock();
+	GetFileNames(argv[1], foutpath, resname, logname, filename, mapname, setpath, setname);
+	ed = clock();
+	printf("cputime for getting file names: %f seconds.\n", (double)(ed - st)/CLOCKS_PER_SEC);
+
 	///////////////////////////////////////////////////////
 	// Initialize .log output
-	
+	// Only record results after GetFileNames
 	LOG.open(logname.c_str(), ios::out);
 	LOG.clear();
-
-	clock_t st, ed;
 
 	/////////////////////////////////////////////////////
 	// Calc data size
@@ -122,7 +121,7 @@ int main(int argc, char* argv[])
 			printf("%d sets have been analyzed\n", i);
 		}
 		
-		string setname="Data/example_bt_tag.set";
+		
 		//string setname;
 		//setname = setpath + "locipair" + to_string(i+1) + ".set";
 

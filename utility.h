@@ -49,6 +49,8 @@ string int2str(int n);
 
 string char2str(char *f);
 
+void GetFileNames(char* cfname, string &foutpath, string &resname, string &logname, string &filename, string &mapname, string &setpath, string &setname);
+
 void GetSnpInfo(string filename, vector<int> &snpchr, vector<string> &snpname);
 
 void GetSetInfo(string setname, vector<string> &snpname, vector<int> &sA, vector<int> &sB, bool &skip_symm, bool set_test, int p);
