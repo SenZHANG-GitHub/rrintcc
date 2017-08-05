@@ -49,13 +49,13 @@ string int2str(int n);
 
 string char2str(char *f);
 
-void GetSnpInfo(char *filename, vector<int> &snpchr, vector<string> &snpname);
+void GetSnpInfo(string filename, vector<int> &snpchr, vector<string> &snpname);
 
-void GetSetInfo(char *setname, vector<string> &snpname, vector<int> &sA, vector<int> &sB, bool &skip_symm, bool set_test, int p);
+void GetSetInfo(string setname, vector<string> &snpname, vector<int> &sA, vector<int> &sB, bool &skip_symm, bool set_test, int p);
 
-void GetDataSize(char *filename, int **DataSize, int &ndataset_out);
+void GetDataSize(string filename, int **DataSize, int &ndataset_out);
 
-void GetData(char *filename, int *DataSize, int &n, int &p, int &ncase, int &nctrl, int ndataset, vector<bool> &pheno, BYTE ***geno, double ***geno_bar);
+void GetData(string filename, int *DataSize, int &n, int &p, int &ncase, int &nctrl, int ndataset, vector<bool> &pheno, BYTE ***geno, double ***geno_bar);
 
 double CalcRegionInter(RInside &R, string fout, vector<bool> &pheno, BYTE **geno, double **geno_bar, vector<int> &snpchr, vector<string> &snpname, bool skip_symm, int p, int n, int ncase, int nctrl, vector<int> &sA, vector<int> &sB, double myth_pgates, double myth_trun, int reps, bool flagperm, int max_cov_cnt);
 

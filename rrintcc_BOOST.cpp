@@ -33,11 +33,13 @@ int main(int argc, char* argv[])
 	string resname 		 = "Results/region_pair_results.txt";
 	string logname 		 = "Results/rrintcc_BOOST.log";
 
-	char filename[100]	 = "Data/filenamelist.txt";
+	string filename	 = "Data/filenamelist.txt";
 	//char mapname[100] 	 = "CUHK_HKDRGWA_6445CC_Clean_Ch1-22.map";
-	char mapname[100] 	 = "Data/example_bt_tag.map";
+	string mapname	 = "Data/example_bt_tag.map";
 
-	char setpath[100]	 = "all_sets/"; // Format of .set/.snps names: locipair1/2/.../.set/snp
+	string setpath	 = "all_sets/"; // Format of .set/.snps names: locipair1/2/.../.set/snp
+
+	cout << "Use all strings successfully" << endl;
 
 	// Used for set-set interaction tests
     // Warning: Should not be changed!!!
@@ -78,32 +80,32 @@ int main(int argc, char* argv[])
 	LOG.open(logname.c_str(), ios::out);
 	LOG.clear();
 
-	time_t st, ed;
+	clock_t st, ed;
 
 	/////////////////////////////////////////////////////
 	// Calc data size
 	printf("-----------------------------------------\n");
 	printf("start getting the data size...\n");
-	time(&st);
+	st = clock();
 	GetDataSize(filename, &DataSize, ndataset);
-	time(&ed);
-	printf("cputime for getting data size: %d seconds.\n", (int)ed - st);
+	ed = clock();
+	printf("cputime for getting data size: %f seconds.\n", (double)(ed - st)/CLOCKS_PER_SEC);
 
 	// load .map data (snp chromosome and snp IDs)
 	printf("-----------------------------------------\n");
 	printf("start reading the map file...\n");
-	time(&st);
+	st = clock();
 	GetSnpInfo(mapname, snpchr, snpname);
-	time(&ed);
-	printf("cputime for reading the map file: %d seconds.\n", (int)ed - st);
+	ed = clock();
+	printf("cputime for reading the map file: %f seconds.\n", (double)(ed - st)/ CLOCKS_PER_SEC);
 
 	// load BOOST.txt data to pheno (n), geno (n*p) and geno_bar (p*2)
 	printf("-----------------------------------------\n");
 	printf("start reading the BOOST file...\n");
-	time(&st);
+	st = clock();
 	GetData(filename, DataSize, n, p, ncase, nctrl, ndataset, pheno, &geno, &geno_bar);
-	time(&ed);
-	printf("cputime for reading the BOOST file: %d seconds.\n", (int)ed - st);
+	ed = clock();
+	printf("cputime for reading the BOOST file: %f seconds.\n", (double)(ed - st)/ CLOCKS_PER_SEC);
 	printf("-----------------------------------------\n");
 	printf("The number of snps: %d\n", p);
 	printf("The number of samples: %d (ncase = %d; nctrl = %d)\n", n, ncase, nctrl);
@@ -114,15 +116,15 @@ int main(int argc, char* argv[])
 //	time(&st);
 	for(int i = 0; i < numSets; i++)
 	{
-		time(&st);
+		st = clock();
 		if (i > 0 && i%1000 == 0)
 		{
 			printf("%d sets have been analyzed\n", i);
 		}
 		
-		char setname[100]="Data/example_bt_tag.set";
-		//char setname[100];
-		//sprintf(setname, "%slocipair%d.set", setpath, i+1);
+		string setname="Data/example_bt_tag.set";
+		//string setname;
+		//setname = setpath + "locipair" + to_string(i+1) + ".set";
 
 		string fout = foutpath;
 		fout.append("snp_pair_results");
@@ -149,8 +151,8 @@ int main(int argc, char* argv[])
 		EPI.flush();
 		EPI.close();
 
-		time(&ed);
-		printf("cputime for calculating the region interactions: %d seconds.\n", (int)ed - st);
+		ed = clock();
+		printf("cputime for calculating the region interactions: %f seconds.\n", (double)(ed - st)/ CLOCKS_PER_SEC);
 	}
 
 

@@ -22,7 +22,7 @@ string char2str(char *f)
 	return s2.str();
 }
 
-void GetSnpInfo(char *filename, vector<int> &snpchr, vector<string> &snpname)
+void GetSnpInfo(string filename, vector<int> &snpchr, vector<string> &snpname)
 {
 	string line;
 	ifstream fp (filename);
@@ -40,8 +40,8 @@ void GetSnpInfo(char *filename, vector<int> &snpchr, vector<string> &snpname)
 	}
 	else
 	{
-		fprintf(stderr,"can't open input file %s\n",filename);
-		printLOG("can't open input file "+char2str(filename)+"\n");
+		fprintf(stderr,"can't open input file %s\n",filename.c_str());
+		printLOG("can't open input file "+ filename +"\n");
 		exit(1);
 	}
 
@@ -57,7 +57,7 @@ void GetSnpInfo(char *filename, vector<int> &snpchr, vector<string> &snpname)
 // (.map file and BOOST file must have the same snps!!!)
 
 
-void GetSetInfo(char *setname, vector<string> &snpname, vector<int> &sA, vector<int> &sB, bool &skip_symm,  bool set_test, int p)
+void GetSetInfo(string setname, vector<string> &snpname, vector<int> &sA, vector<int> &sB, bool &skip_symm,  bool set_test, int p)
 {
 
 	vector<vector <int> > snpset;
@@ -101,8 +101,8 @@ void GetSetInfo(char *setname, vector<string> &snpname, vector<int> &sA, vector<
 	}
 	else
 	{
-		printf("cannot open the file: %s\n", setname);
-		printLOG("cannot open the file: "+char2str(setname)+"\n");
+		printf("cannot open the file: %s\n", setname.c_str());
+		printLOG("cannot open the file: "+ setname +"\n");
 		exit(1);
 	}
 
@@ -149,7 +149,7 @@ void GetSetInfo(char *setname, vector<string> &snpname, vector<int> &sA, vector<
 		}
 	}
 }
-void GetDataSize(char *filename, int **DataSize, int &ndataset_out)
+void GetDataSize(string filename, int **DataSize, int &ndataset_out)
 {
 	FILE * fp, *fp_i;
 	int c, ndataset;
@@ -157,11 +157,11 @@ void GetDataSize(char *filename, int **DataSize, int &ndataset_out)
 	char filename_i[100];
 
 
-	fp = fopen(filename, "r");
+	fp = fopen(filename.c_str(), "r");
 	if (fp == NULL)
 	{
-		fprintf(stderr, "can't open input file %s\n", filename);
-		printLOG("can't open input file "+char2str(filename)+"\n");
+		fprintf(stderr, "can't open input file %s\n", filename.c_str());
+		printLOG("can't open input file "+filename+"\n");
 		exit(1);
 	}
 
@@ -249,7 +249,7 @@ void GetDataSize(char *filename, int **DataSize, int &ndataset_out)
 	ndataset_out = ndataset;
 }
 
-void GetData(char *filename, int *DataSize, int &n, int &p, int &ncase, int &nctrl, int ndataset, vector<bool> &pheno, BYTE ***geno, double ***geno_bar)
+void GetData(string filename, int *DataSize, int &n, int &p, int &ncase, int &nctrl, int ndataset, vector<bool> &pheno, BYTE ***geno, double ***geno_bar)
 {
 	FILE * fp, *fp_i;
 	char filename_i[100];
@@ -275,11 +275,11 @@ void GetData(char *filename, int *DataSize, int &n, int &p, int &ncase, int &nct
 	ncase = 0;
 	nctrl = 0;
 
-	fp = fopen(filename, "r");
+	fp = fopen(filename.c_str(), "r");
 	if (fp == NULL)
 	{
-		fprintf(stderr, "can't open input file %s\n", filename);
-		printLOG("Can't open input file "+char2str(filename)+"\n");
+		fprintf(stderr, "can't open input file %s\n", filename.c_str());
+		printLOG("Can't open input file "+filename+"\n");
 		exit(1);
 	}
 	// only use the first file to get ncase and nctrl
@@ -678,11 +678,16 @@ double CalcRegionInter(RInside &R, string fout, vector<bool> &pheno, BYTE **geno
 	EPI.close();
 
 	// Calc and return pmin
+	clock_t st, ed;
+	st = clock();
 	R["numpv"] = plist.size();
 	R["cori"] = corr_matrix;
 	R["minpv"] = *min_element(plist.begin(), plist.end());
 
-	return R.parseEval("1-pmvnorm(lower=qnorm(minpv/2),upper=-qnorm(minpv/2),mean=rep(0, numpv),corr=cori)");
+	double pmin = R.parseEval("1-pmvnorm(lower=qnorm(minpv/2),upper=-qnorm(minpv/2),mean=rep(0, numpv),corr=cori)");
+	ed = clock();
+	printf("cputime for calling R fucntions pmvnorm: %f seconds.\n", (double)(ed - st)/ CLOCKS_PER_SEC);
+	return pmin;
 
 }
 
