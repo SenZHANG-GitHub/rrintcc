@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
 	string foutpath, resname, logname, configname;
 	string filename, mapname, setpath, setname;
 
-	configname = "configNames.txt"
+	configname = "configNames.txt";
 
 	// Used for set-set interaction tests
     // Warning: Should not be changed!!!
