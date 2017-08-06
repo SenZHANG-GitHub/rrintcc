@@ -22,15 +22,19 @@ string char2str(char *f)
 	return s2.str();
 }
 
-void GetFileNames(char* cfname, string &foutpath, string &resname, string &logname, string &filename, string &mapname, string &setpath, string &setname)
+void GetFileNames(string cfname, string &foutpath, string &resname, string &logname, string &filename, string &mapname, string &setpath, string &setname, bool show_message)
 {
 	// Should not use printLOG cuz logname is not yet ready
-	if (cfname == NULL) {
+	if (cfname.empty()) {
 		fprintf(stderr,"err: no configuration txt is specified in argv[1]\n");
 		//printLOG("err: no configuration txt is specified in argv[1]\n");
+		exit(1);
 	}
 
-	printf("file for filename configuration: %s\n", cfname);
+	if (show_message)
+	{
+		printf("file for filename configuration: %s\n", cfname);
+	}
 	//printLOG("file for filename configuration: " + char2str(cfname) + "\n");
 
 	ifstream fp(cfname);
@@ -117,7 +121,7 @@ void GetFileNames(char* cfname, string &foutpath, string &resname, string &logna
 }
 
 
-void GetSnpInfo(string filename, vector<int> &snpchr, vector<string> &snpname)
+void GetSnpInfo(string filename, vector<int> &snpchr, vector<string> &snpname, bool show_message)
 {
 	string line;
 	ifstream fp (filename);
@@ -152,7 +156,7 @@ void GetSnpInfo(string filename, vector<int> &snpchr, vector<string> &snpname)
 // (.map file and BOOST file must have the same snps!!!)
 
 
-void GetSetInfo(string setname, vector<string> &snpname, vector<int> &sA, vector<int> &sB, bool &skip_symm,  bool set_test, int p)
+void GetSetInfo(string setname, vector<string> &snpname, vector<int> &sA, vector<int> &sB, bool &skip_symm,  bool set_test, int p, bool show_message)
 {
 
 	vector<vector <int> > snpset;
@@ -244,7 +248,7 @@ void GetSetInfo(string setname, vector<string> &snpname, vector<int> &sA, vector
 		}
 	}
 }
-void GetDataSize(string filename, int **DataSize, int &ndataset_out)
+void GetDataSize(string filename, int **DataSize, int &ndataset_out, bool show_message)
 {
 	FILE * fp, *fp_i;
 	int c, ndataset;
@@ -344,7 +348,7 @@ void GetDataSize(string filename, int **DataSize, int &ndataset_out)
 	ndataset_out = ndataset;
 }
 
-void GetData(string filename, int *DataSize, int &n, int &p, int &ncase, int &nctrl, int ndataset, vector<bool> &pheno, BYTE ***geno, double ***geno_bar)
+void GetData(string filename, int *DataSize, int &n, int &p, int &ncase, int &nctrl, int ndataset, vector<bool> &pheno, BYTE ***geno, double ***geno_bar, bool show_message)
 {
 	FILE * fp, *fp_i;
 	char filename_i[100];
@@ -353,8 +357,11 @@ void GetData(string filename, int *DataSize, int &n, int &p, int &ncase, int &nc
 
 	n = DataSize[0];
 	p = 0;
-	printf("n = %d\n", n);
-	printLOG("n = "+int2str(n)+"\n");
+	if (show_message)
+	{
+		printf("n = %d\n", n);
+		printLOG("n = "+int2str(n)+"\n");
+	}
 
 	for (i = 0; i<ndataset; i++)
 	{
@@ -379,8 +386,13 @@ void GetData(string filename, int *DataSize, int &n, int &p, int &ncase, int &nc
 	}
 	// only use the first file to get ncase and nctrl
 	fscanf(fp, "%s\n", &filename_i);
-	printf("%s\n", filename_i);
-	printLOG(char2str(filename_i) + "\n");
+
+	if (show_message)
+	{
+		printf("%s\n", filename_i);
+		printLOG(char2str(filename_i) + "\n");
+	}
+
 	fp_i = fopen(filename_i, "r");
 
 	while (!feof(fp_i)) {
@@ -557,7 +569,7 @@ From mapname: E.g. "example_bt_tag.map"
 //////////////////////////////////////////////////////////////////////
 // vector<double> [0]: pgates; [1]: ptts; [2]: ptprod
 
-double CalcRegionInter(RInside &R, string fout, vector<bool> &pheno, BYTE **geno, double **geno_bar, vector<int> &snpchr, vector<string> &snpname, bool skip_symm, int p, int n, int ncase, int nctrl, vector<int> &sA, vector<int> &sB, double myth_pgates, double myth_trun, int reps, bool flagperm, int max_cov_cnt)
+double CalcRegionInter(RInside &R, string fout, vector<bool> &pheno, BYTE **geno, double **geno_bar, vector<int> &snpchr, vector<string> &snpname, bool skip_symm, int p, int n, int ncase, int nctrl, vector<int> &sA, vector<int> &sB, double myth_pgates, double myth_trun, int reps, bool flagperm, int max_cov_cnt, bool show_message)
 {
 
 	// Take a list of SNPs, or all SNPs 
@@ -580,7 +592,7 @@ double CalcRegionInter(RInside &R, string fout, vector<bool> &pheno, BYTE **geno
 	///////////////////////////////////////////////////////////
 	// Begin iterating over pairs: SET x SET
 	// Rewrite zlist, plist, and cov_index
-	LDContrastTest(pheno, zlist, plist, cov_index, geno, geno_bar, sA, sB, skip_symm, p, n, ncase, nctrl);
+	LDContrastTest(pheno, zlist, plist, cov_index, geno, geno_bar, sA, sB, skip_symm, p, n, ncase, nctrl, show_message);
 
 	// Write results to output file
 	ofstream EPI;
@@ -781,14 +793,17 @@ double CalcRegionInter(RInside &R, string fout, vector<bool> &pheno, BYTE **geno
 
 	double pmin = R.parseEval("1-pmvnorm(lower=qnorm(minpv/2),upper=-qnorm(minpv/2),mean=rep(0, numpv),corr=cori)");
 	ed = clock();
-	printf("cputime for calling R fucntions pmvnorm: %f seconds.\n", (double)(ed - st)/ CLOCKS_PER_SEC);
+	if (show_message)
+	{
+		printf("cputime for calling R fucntions pmvnorm: %f seconds.\n", (double)(ed - st)/ CLOCKS_PER_SEC);
+	}
 	return pmin;
 
 }
 
 
 // Clear and ReWrite zlist, plist, and cov_index
-void LDContrastTest(vector<bool> &pheno, vector<double> &zlist, vector<double> &plist, vector<int> &cov_index, BYTE **geno, double **geno_bar, vector<int> &sA, vector<int> &sB, bool skip_symm, int p, int n, int ncase, int nctrl)
+void LDContrastTest(vector<bool> &pheno, vector<double> &zlist, vector<double> &plist, vector<int> &cov_index, BYTE **geno, double **geno_bar, vector<int> &sA, vector<int> &sB, bool skip_symm, int p, int n, int ncase, int nctrl, bool show_message)
 {
 	int ii = 0;
 	double z_ld, ld_aff, ld_unf, v_ld_aff, v_ld_unf;
@@ -845,7 +860,7 @@ void LDContrastTest(vector<bool> &pheno, vector<double> &zlist, vector<double> &
 		        zlist.push_back(z_ld);
 		        plist.push_back(normdist(-fabs(z_ld)) * 2);
 
-				if ((ii+1)%10000==0)
+				if (show_message && (ii+1)%10000==0)
 					printf("SNP pair %d.\n", ii+1);
 
 				ii ++;

@@ -19,6 +19,8 @@ The contigency table collection part is modified from BOOSTx64.c (Can YANG, 2010
 
 */
 
+// Format: ./rrintcc_BOOST --config configNames.txt --silent --max-cov 10000
+
 #include "utility.h"
 
 using namespace std;
@@ -29,11 +31,14 @@ int main(int argc, char* argv[])
 {
 	/* Declare variable */
 	int    numSets 		 = 1;
-	string foutpath, resname, logname;
+	string foutpath, resname, logname, configname;
 	string filename, mapname, setpath, setname;
+
+	configname = "configNames.txt";
 
 	// Used for set-set interaction tests
     // Warning: Should not be changed!!!
+    bool show_message	 = true;
 	bool skip_symm 		 = false;
 	bool set_test 		 = true;
 
@@ -42,7 +47,32 @@ int main(int argc, char* argv[])
 	double myth_trun  	 = 0.05;
 	int    reps 	     = 1000;   // How many permutations will be performed if flagperm = true
 	bool   flagperm 	 = false;  // whether do permutations for ptts and ptprod or not 
-    int    max_cov_cnt   = 20000;   // default: 1000 (means the cov matrix is at most 1000*1000)
+    int    max_cov_cnt   = 20000;   // default: 20000 (means the cov matrix is at most 20000*20000)
+
+    // Read data from argv[]
+    for (int i = 1; i < argc; i++)
+    {
+    	if (strcmp(argv[i], "--config") == 0 || strcmp(argv[i], "-c") == 0)
+    		configname = argv[i+1];
+
+    	if (strcmp(argv[i], "--silent") == 0 || strcmp(argv[i], "-s") == 0) 
+    	{
+    		show_message = false;
+    	}
+
+    	if (strcmp(argv[i], "--max-cov") == 0) 
+    	{
+    		if (argv[i+1] == NULL || ! atoi(argv[i+1])) 
+    		{
+    			printf("err: illegal input for --max-cov\n");
+    			exit(1);
+    		}
+    		max_cov_cnt = atoi(argv[i+1]);
+    	}
+
+    	//if (strcmp(argv[i], "--set") == 0 || strcmp(argv[i], "-s") == 0) 
+
+    }
 
 	int *DataSize;
 	int ndataset;
@@ -68,12 +98,18 @@ int main(int argc, char* argv[])
 
 	/////////////////////////////////////////////////////
 	// Calc file names
-	printf("-----------------------------------------\n");
-	printf("start getting the file names...\n");
+	if (show_message) 
+	{
+		printf("-----------------------------------------\n");
+		printf("start getting the file names...\n");
+	}
 	st = clock();
-	GetFileNames(argv[1], foutpath, resname, logname, filename, mapname, setpath, setname);
+	GetFileNames(configname, foutpath, resname, logname, filename, mapname, setpath, setname, show_message);
 	ed = clock();
-	printf("cputime for getting file names: %f seconds.\n", (double)(ed - st)/CLOCKS_PER_SEC);
+	if (show_message) 
+	{
+		printf("cputime for getting file names: %f seconds.\n", (double)(ed - st)/CLOCKS_PER_SEC);
+	}
 
 	///////////////////////////////////////////////////////
 	// Initialize .log output
@@ -83,40 +119,61 @@ int main(int argc, char* argv[])
 
 	/////////////////////////////////////////////////////
 	// Calc data size
-	printf("-----------------------------------------\n");
-	printf("start getting the data size...\n");
+	if (show_message) 
+	{
+		printf("-----------------------------------------\n");
+		printf("start getting the data size...\n");
+	}
 	st = clock();
-	GetDataSize(filename, &DataSize, ndataset);
+	GetDataSize(filename, &DataSize, ndataset, show_message);
 	ed = clock();
-	printf("cputime for getting data size: %f seconds.\n", (double)(ed - st)/CLOCKS_PER_SEC);
+	if (show_message) 
+	{
+		printf("cputime for getting data size: %f seconds.\n", (double)(ed - st)/CLOCKS_PER_SEC);
+	}
 
 	// load .map data (snp chromosome and snp IDs)
-	printf("-----------------------------------------\n");
-	printf("start reading the map file...\n");
+	if (show_message) 
+	{
+		printf("-----------------------------------------\n");
+		printf("start reading the map file...\n");
+	}
 	st = clock();
-	GetSnpInfo(mapname, snpchr, snpname);
+	GetSnpInfo(mapname, snpchr, snpname, show_message);
 	ed = clock();
-	printf("cputime for reading the map file: %f seconds.\n", (double)(ed - st)/ CLOCKS_PER_SEC);
+	if (show_message) 
+	{
+		printf("cputime for reading the map file: %f seconds.\n", (double)(ed - st)/ CLOCKS_PER_SEC);
+	}
 
 	// load BOOST.txt data to pheno (n), geno (n*p) and geno_bar (p*2)
-	printf("-----------------------------------------\n");
-	printf("start reading the BOOST file...\n");
+	if (show_message) 
+	{
+		printf("-----------------------------------------\n");
+		printf("start reading the BOOST file...\n");
+	}
 	st = clock();
-	GetData(filename, DataSize, n, p, ncase, nctrl, ndataset, pheno, &geno, &geno_bar);
+	GetData(filename, DataSize, n, p, ncase, nctrl, ndataset, pheno, &geno, &geno_bar, show_message);
 	ed = clock();
-	printf("cputime for reading the BOOST file: %f seconds.\n", (double)(ed - st)/ CLOCKS_PER_SEC);
-	printf("-----------------------------------------\n");
-	printf("The number of snps: %d\n", p);
-	printf("The number of samples: %d (ncase = %d; nctrl = %d)\n", n, ncase, nctrl);
+	if (show_message) 
+	{
+		printf("cputime for reading the BOOST file: %f seconds.\n", (double)(ed - st)/ CLOCKS_PER_SEC);
+		printf("-----------------------------------------\n");
+		printf("The number of snps: %d\n", p);
+		printf("The number of samples: %d (ncase = %d; nctrl = %d)\n", n, ncase, nctrl);
+	}
 
 	//////////////////////////////////////////////////////////////////////////////
-	printf("-----------------------------------------\n");
-	printf("start calculating the region interactions...\n");
+	if (show_message) 
+	{
+		printf("-----------------------------------------\n");
+		printf("start calculating the region interactions...\n");
+	}
 //	time(&st);
 	for(int i = 0; i < numSets; i++)
 	{
 		st = clock();
-		if (i > 0 && i%1000 == 0)
+		if (show_message && i > 0 && i%1000 == 0)
 		{
 			printf("%d sets have been analyzed\n", i);
 		}
@@ -135,9 +192,9 @@ int main(int argc, char* argv[])
 		sA.clear();
 		sB.clear();
 		skip_symm = false; // Need to reset skip_symm, sA, sB!!!
-		GetSetInfo(setname, snpname, sA, sB, skip_symm, set_test, p);
+		GetSetInfo(setname, snpname, sA, sB, skip_symm, set_test, p, show_message);
 
-		pmin = CalcRegionInter(R, fout, pheno, geno, geno_bar, snpchr, snpname, skip_symm, p, n, ncase, nctrl, sA, sB, myth_pgates, myth_trun, reps, flagperm, max_cov_cnt);
+		pmin = CalcRegionInter(R, fout, pheno, geno, geno_bar, snpchr, snpname, skip_symm, p, n, ncase, nctrl, sA, sB, myth_pgates, myth_trun, reps, flagperm, max_cov_cnt, show_message);
 
 		// ofstream::app: Appending to the last line of current file
 		// ios::out: Rewrite current file (See utility.cpp) 
@@ -151,8 +208,11 @@ int main(int argc, char* argv[])
 		EPI.close();
 
 		ed = clock();
-		printf("cputime for calculating the region interactions: %f seconds.\n", (double)(ed - st)/ CLOCKS_PER_SEC);
-	}
+
+		if (show_message) 
+		{	printf("cputime for calculating the region interactions: %f seconds.\n", (double)(ed - st)/ CLOCKS_PER_SEC);
+		}
+	}	
 
 
 	// time(&ed);

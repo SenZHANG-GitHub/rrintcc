@@ -1,0 +1,54 @@
+Usage of rrintcc_BOOST
+******************************************************************
+1. The parameters that can be added in command line
+******************************************************************
+
+--config (-c): specify the file that contains filename configuration (default: configNames.txt)
+
+--silent (-s): do not output information 
+
+--max-cov: specify the maximum range of the cov matrix (default: 20000: meaning the cov matrix is at most 20000 * 20000)
+
+e.g. 
+./rrintcc_BOOST --config configNames_tmp.txt --silent --max-cov 10000
+
+******************************************************************
+2. The format of configNames.txt (below is an example)
+******************************************************************
+# Formats for configNames.txt
+# '#' can be used in the front of a line to comment this line
+# Empty lines are permited in this file
+# The filenames need not be ordered
+# There should be two words per line
+# The two words should be separated by spaces or tabs
+# The first word in a line is the variable name in rrintcc
+# The second word in a line is the content for this variable 
+# Variables that need to be specified in this file:
+# foutpath, resname, logname, filename, mapname, setpath, setname
+
+foutpath    Results/snp_results/
+resname	    Results/region_pair_results.txt
+logname	    Results/rrintcc_BOOST.log
+
+filename    Data/filenamelist.txt
+mapname	    Data/example_bt_tag.map
+setname	    Data/example_bt_tag.set
+
+# Format of .set/.snps names: locipair1/2/.../.set/snp
+setpath	    all_sets/
+
+******************************************************************
+3. The format of filename in configNames.txt (e.g. filenamelist.txt)
+******************************************************************
+The filename in configNames.txt is consistent with BOOST and GBOOST, should contains the BOOST-formated file that need to be analyzed.
+
+PLINK-formated files (.ped .frq) can be transformed to BOOST-formated using preprocessing_BOOST.py
+
+.bed/.bim/.fam files can be transformed to .ped/.frq using plink1.9, e.g. 
+plink1.9 --bfile MIGen_QC --recode --out MIGen_QC
+
+.frq file can be generated using plink1.9, e.g.
+plink1.9 --file MIGen_QC --freq --out MIGen_QC 
+plink1.9 --bfile MIGen_QC --freq --out MIGen_QC 
+
+
