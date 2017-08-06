@@ -49,18 +49,18 @@ string int2str(int n);
 
 string char2str(char *f);
 
-void GetFileNames(char* cfname, string &foutpath, string &resname, string &logname, string &filename, string &mapname, string &setpath, string &setname);
+void GetFileNames(string cfname, string &foutpath, string &resname, string &logname, string &filename, string &mapname, string &setpath, string &setname, bool show_message);
 
-void GetSnpInfo(string filename, vector<int> &snpchr, vector<string> &snpname);
+void GetSnpInfo(string filename, vector<int> &snpchr, vector<string> &snpname, bool show_message);
 
-void GetSetInfo(string setname, vector<string> &snpname, vector<int> &sA, vector<int> &sB, bool &skip_symm, bool set_test, int p);
+void GetSetInfo(string setname, vector<string> &snpname, vector<int> &sA, vector<int> &sB, bool &skip_symm, bool set_test, int p, bool show_message);
 
-void GetDataSize(string filename, int **DataSize, int &ndataset_out);
+void GetDataSize(string filename, int **DataSize, int &ndataset_out, bool show_message);
 
-void GetData(string filename, int *DataSize, int &n, int &p, int &ncase, int &nctrl, int ndataset, vector<bool> &pheno, BYTE ***geno, double ***geno_bar);
+void GetData(string filename, int *DataSize, int &n, int &p, int &ncase, int &nctrl, int ndataset, vector<bool> &pheno, BYTE ***geno, double ***geno_bar, bool show_message);
 
-double CalcRegionInter(RInside &R, string fout, vector<bool> &pheno, BYTE **geno, double **geno_bar, vector<int> &snpchr, vector<string> &snpname, bool skip_symm, int p, int n, int ncase, int nctrl, vector<int> &sA, vector<int> &sB, double myth_pgates, double myth_trun, int reps, bool flagperm, int max_cov_cnt);
+double CalcRegionInter(RInside &R, string fout, vector<bool> &pheno, BYTE **geno, double **geno_bar, vector<int> &snpchr, vector<string> &snpname, bool skip_symm, int p, int n, int ncase, int nctrl, vector<int> &sA, vector<int> &sB, double myth_pgates, double myth_trun, int reps, bool flagperm, int max_cov_cnt, bool show_message);
 
-void LDContrastTest(vector<bool> &pheno, vector<double> &zlist, vector<double> &plist, vector<int> &cov_index, BYTE **geno, double **geno_bar, vector<int> &sA, vector<int> &sB, bool skip_symm, int p, int n, int ncase, int nctrl);
+void LDContrastTest(vector<bool> &pheno, vector<double> &zlist, vector<double> &plist, vector<int> &cov_index, BYTE **geno, double **geno_bar, vector<int> &sA, vector<int> &sB, bool skip_symm, int p, int n, int ncase, int nctrl, bool show_message);
 
 #endif
