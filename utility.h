@@ -49,7 +49,7 @@ string int2str(int n);
 
 string char2str(char *f);
 
-void GetFileNames(string cfname, string &foutpath, string &resname, string &logname, string &filename, string &mapname, string &setpath, string &setname, bool show_message);
+void GetFileNames(string cfname, string &foutpath, string &resname, string &logname, string &filename, string &mapname, string &setpath, string &setname, int &numSets, bool show_message);
 
 void GetSnpInfo(string filename, vector<int> &snpchr, vector<string> &snpname, bool show_message);
 
@@ -63,4 +63,5 @@ double CalcRegionInter(RInside &R, string fout, vector<bool> &pheno, BYTE **geno
 
 void LDContrastTest(vector<bool> &pheno, vector<double> &zlist, vector<double> &plist, vector<int> &cov_index, BYTE **geno, double **geno_bar, vector<int> &sA, vector<int> &sB, bool skip_symm, int p, int n, int ncase, int nctrl, bool show_message);
 
+bool isFileExist(const char *fileName);
 #endif

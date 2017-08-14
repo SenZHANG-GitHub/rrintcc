@@ -8,19 +8,22 @@
 # The first word in a line is the variable name in rrintcc
 # The second word in a line is the content for this variable 
 # Variables that need to be specified in this file:
-# foutpath, resname, logname, filename, mapname, setpath, setname
+# foutpath, resname, logname, filename, mapname, setname
+# setnumber, setpath (These two are only needed under --all/-a)
 #################################################################
 
-foutpath    Results/snp_results/
-resname	    Results/region_pair_results.txt
+foutpath    all_sets_test/Results/snp_results/
+resname	    all_sets_test/Results/region_pair_results.txt
 logname	    Results/rrintcc_BOOST.log
 
-filename    Data/filenamelist.txt
-mapname	    Data/example_bt_tag.map
+filename    all_sets_test/Data/filenamelist.txt
+mapname	    all_sets_test/Data/MIGen_QC.map
 setname	    Data/example_bt_tag.set
 
-# Format of .set/.snps names: locipair1/2/.../.set/snp
-setpath	    all_sets/
+# setpath is used for real data, so that we only read the BOOST data once 
+# in order to calculate the set pairs inside one run of rrintcc
+setpath	    all_sets_test/
+setnumber	3
 
 # mapname    CUHK_HKDRGWA_6445CC_Clean_Ch1-22.map
 

@@ -19,7 +19,9 @@ The contigency table collection part is modified from BOOSTx64.c (Can YANG, 2010
 
 */
 
-// Format: ./rrintcc_BOOST --config configNames.txt --silent --max-cov 10000
+// Format: ./rrintcc_BOOST --config configNames.txt --silent --max-cov 10000 --all
+// --all means will read all .set files in setpath (with format: locipair0.set, locipair1.set,...)
+// setnumber and setpath in config file will only be activated under --all (-a)
 
 #include "utility.h"
 
@@ -41,6 +43,7 @@ int main(int argc, char* argv[])
     bool show_message	 = true;
 	bool skip_symm 		 = false;
 	bool set_test 		 = true;
+	bool all_sets_flag 		 = false;
 
 	// Used for combined p value calculation
 	double myth_pgates 	 = 0.05;
@@ -70,7 +73,8 @@ int main(int argc, char* argv[])
     		max_cov_cnt = atoi(argv[i+1]);
     	}
 
-    	//if (strcmp(argv[i], "--set") == 0 || strcmp(argv[i], "-s") == 0) 
+    	if (strcmp(argv[i], "--all") == 0 || strcmp(argv[i], "-a") == 0)
+	    	all_sets_flag = true;
 
     }
 
@@ -92,7 +96,7 @@ int main(int argc, char* argv[])
 	int n, p, ncase, nctrl;;  // n: number of samples; p: number of varibles
 	
 	RInside R(argc, argv);
-	R.parseEvalQ("library(mvtnorm); library(corpcor)");
+	R.parseEvalQ("library(mvtnorm)");
 	
 	clock_t st, ed;
 
@@ -104,7 +108,8 @@ int main(int argc, char* argv[])
 		printf("start getting the file names...\n");
 	}
 	st = clock();
-	GetFileNames(configname, foutpath, resname, logname, filename, mapname, setpath, setname, show_message);
+	GetFileNames(configname, foutpath, resname, logname, filename, mapname, setpath, setname, numSets, show_message);
+
 	ed = clock();
 	if (show_message) 
 	{
@@ -170,23 +175,33 @@ int main(int argc, char* argv[])
 		printf("start calculating the region interactions...\n");
 	}
 //	time(&st);
+
+	if (all_sets_flag && isFileExist(resname.c_str()))
+		remove(resname.c_str());
+
+	if (!all_sets_flag)
+		numSets = 1;
+
 	for(int i = 0; i < numSets; i++)
 	{
+		string fout = foutpath;
+
 		st = clock();
-		if (show_message && i > 0 && i%1000 == 0)
+		if (show_message && i%100 == 0)
 		{
 			printf("%d sets have been analyzed\n", i);
 		}
 		
-		
-		//string setname;
-		//setname = setpath + "locipair" + to_string(i+1) + ".set";
-
-		string fout = foutpath;
-		fout.append("snp_pair_results");
-		fout.append(to_string(i+1));
-		fout.append(".txt");
-
+		if (all_sets_flag) 
+		{
+			setname = setpath + "locipair" + to_string(i) + ".set";
+			fout.append("snp_pair_results");
+			fout.append(to_string(i));
+			fout.append(".txt");
+		} else
+		{
+			fout.append("snp_pair_results.txt");
+		}
 
 		// load .set data: Write sA, sB, and skip_symm inside
 		sA.clear();
@@ -201,7 +216,7 @@ int main(int argc, char* argv[])
 		ofstream EPI;
 		EPI.open(resname.c_str(), ofstream::app);
 		EPI.precision(4);
-		EPI << setw(8)  << "Pair " << to_string(i+1) << " | " 
+		EPI << setw(8)  << "Pair " << to_string(i) << " | " 
 			<< setw(8)  << "pmin: " << " "
 			<< setw(15) << pmin << "\n";
 		EPI.flush();
@@ -209,9 +224,9 @@ int main(int argc, char* argv[])
 
 		ed = clock();
 
-		if (show_message) 
+		/*if (show_message) 
 		{	printf("cputime for calculating the region interactions: %f seconds.\n", (double)(ed - st)/ CLOCKS_PER_SEC);
-		}
+		}*/
 	}	
 
 

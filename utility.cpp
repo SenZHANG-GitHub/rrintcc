@@ -22,7 +22,13 @@ string char2str(char *f)
 	return s2.str();
 }
 
-void GetFileNames(string cfname, string &foutpath, string &resname, string &logname, string &filename, string &mapname, string &setpath, string &setname, bool show_message)
+bool isFileExist(const char *fileName)
+{
+    std::ifstream infile(fileName);
+    return infile.good();
+}
+
+void GetFileNames(string cfname, string &foutpath, string &resname, string &logname, string &filename, string &mapname, string &setpath, string &setname, int &numSets, bool show_message)
 {
 	// Should not use printLOG cuz logname is not yet ready
 	if (cfname.empty()) {
@@ -33,7 +39,7 @@ void GetFileNames(string cfname, string &foutpath, string &resname, string &logn
 
 	if (show_message)
 	{
-		printf("file for filename configuration: %s\n", cfname);
+		printf("file for filename configuration: %s\n", cfname.c_str());
 	}
 	//printLOG("file for filename configuration: " + char2str(cfname) + "\n");
 
@@ -72,6 +78,13 @@ void GetFileNames(string cfname, string &foutpath, string &resname, string &logn
 
 			if (id == "setname")
 				iss >> setname;
+
+			if (id == "setnumber")
+			{
+				string tmpnumber;
+				iss >> tmpnumber;
+				numSets = stoi(tmpnumber);
+			}
 
 		}
 	} else {
@@ -793,10 +806,10 @@ double CalcRegionInter(RInside &R, string fout, vector<bool> &pheno, BYTE **geno
 
 	double pmin = R.parseEval("1-pmvnorm(lower=qnorm(minpv/2),upper=-qnorm(minpv/2),mean=rep(0, numpv),corr=cori)");
 	ed = clock();
-	if (show_message)
+	/*if (show_message)
 	{
 		printf("cputime for calling R fucntions pmvnorm: %f seconds.\n", (double)(ed - st)/ CLOCKS_PER_SEC);
-	}
+	}*/
 	return pmin;
 
 }

@@ -2,6 +2,8 @@ Data/*
 test/*
 Results/*
 Results_R/*
+R_Packages/*
+all_sets_test/*
 rrintcc_BOOST
 rrintcc_BOOST.log
 *.o
