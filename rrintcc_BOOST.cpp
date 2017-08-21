@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
 	RInside R(argc, argv);
 	R.parseEvalQ("library(mvtnorm)");
 	
-	clock_t st, ed;
+	clock_t st, ed, st1, ed1;
 
 	/////////////////////////////////////////////////////
 	// Calc file names
@@ -207,7 +207,15 @@ int main(int argc, char* argv[])
 		sA.clear();
 		sB.clear();
 		skip_symm = false; // Need to reset skip_symm, sA, sB!!!
+
+		st1 = clock();
 		GetSetInfo(setname, snpname, sA, sB, skip_symm, set_test, p, show_message);
+		ed1 = clock();
+
+		if (show_message) 
+		{	printf("cputime for getting set information: %f seconds.\n", (double)(ed1 - st1)/ CLOCKS_PER_SEC);
+		}
+
 
 		pmin = CalcRegionInter(R, fout, pheno, geno, geno_bar, snpchr, snpname, skip_symm, p, n, ncase, nctrl, sA, sB, myth_pgates, myth_trun, reps, flagperm, max_cov_cnt, show_message);
 
@@ -224,9 +232,10 @@ int main(int argc, char* argv[])
 
 		ed = clock();
 
-		/*if (show_message) 
+		if (show_message) 
 		{	printf("cputime for calculating the region interactions: %f seconds.\n", (double)(ed - st)/ CLOCKS_PER_SEC);
-		}*/
+			printf("-----------------------------------------\n");
+		}
 	}	
 
 

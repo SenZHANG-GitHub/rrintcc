@@ -806,10 +806,10 @@ double CalcRegionInter(RInside &R, string fout, vector<bool> &pheno, BYTE **geno
 
 	double pmin = R.parseEval("1-pmvnorm(lower=qnorm(minpv/2),upper=-qnorm(minpv/2),mean=rep(0, numpv),corr=cori)");
 	ed = clock();
-	/*if (show_message)
+	if (show_message)
 	{
 		printf("cputime for calling R fucntions pmvnorm: %f seconds.\n", (double)(ed - st)/ CLOCKS_PER_SEC);
-	}*/
+	}
 	return pmin;
 
 }
