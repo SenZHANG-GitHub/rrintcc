@@ -28,6 +28,7 @@ The contigency table collection part is modified from BOOSTx64.c (Can YANG, 2010
 using namespace std;
 
 ofstream LOG;
+RInside RTmp;
 
 int main(int argc, char* argv[])
 {
@@ -95,8 +96,7 @@ int main(int argc, char* argv[])
 
 	int n, p, ncase, nctrl;;  // n: number of samples; p: number of varibles
 	
-	RInside R(argc, argv);
-	R.parseEvalQ("library(mvtnorm)");
+	RTmp.parseEvalQ("library(mvtnorm)");
 	
 	clock_t st, ed, st1, ed1;
 
@@ -217,7 +217,7 @@ int main(int argc, char* argv[])
 		}
 
 
-		pmin = CalcRegionInter(R, fout, pheno, geno, geno_bar, snpchr, snpname, skip_symm, p, n, ncase, nctrl, sA, sB, myth_pgates, myth_trun, reps, flagperm, max_cov_cnt, show_message);
+		pmin = CalcRegionInter(fout, pheno, geno, geno_bar, snpchr, snpname, skip_symm, p, n, ncase, nctrl, sA, sB, myth_pgates, myth_trun, reps, flagperm, max_cov_cnt, show_message);
 
 		// ofstream::app: Appending to the last line of current file
 		// ios::out: Rewrite current file (See utility.cpp) 

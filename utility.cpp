@@ -1,7 +1,5 @@
 #include "utility.h"
 
-extern ofstream LOG;
-
 void printLOG(string s)
 {
 	LOG << s;
@@ -582,7 +580,7 @@ From mapname: E.g. "example_bt_tag.map"
 //////////////////////////////////////////////////////////////////////
 // vector<double> [0]: pgates; [1]: ptts; [2]: ptprod
 
-double CalcRegionInter(RInside &R, string fout, vector<bool> &pheno, BYTE **geno, double **geno_bar, vector<int> &snpchr, vector<string> &snpname, bool skip_symm, int p, int n, int ncase, int nctrl, vector<int> &sA, vector<int> &sB, double myth_pgates, double myth_trun, int reps, bool flagperm, int max_cov_cnt, bool show_message)
+double CalcRegionInter(string fout, vector<bool> &pheno, BYTE **geno, double **geno_bar, vector<int> &snpchr, vector<string> &snpname, bool skip_symm, int p, int n, int ncase, int nctrl, vector<int> &sA, vector<int> &sB, double myth_pgates, double myth_trun, int reps, bool flagperm, int max_cov_cnt, bool show_message)
 {
 
 	// Take a list of SNPs, or all SNPs 
@@ -653,16 +651,16 @@ double CalcRegionInter(RInside &R, string fout, vector<bool> &pheno, BYTE **geno
 
 	// We can re-assign matrix to cori
 	Rcpp::NumericMatrix corr_matrix1(6, 6);
-	R["cori"] = corr_matrix1;
-	R.parseEvalQ("print(cori)");
+	RTmp["cori"] = corr_matrix1;
+	RTmp.parseEvalQ("print(cori)");
 
 	Rcpp::NumericMatrix corr_matrix2(3, 3);
-	R["cori"] = corr_matrix2;
-	R.parseEvalQ("print(cori)");
+	RTmp["cori"] = corr_matrix2;
+	RTmp.parseEvalQ("print(cori)");
 
-	// cori in R is binded to corr_matrix2 (like a pointer), changing values in corr_matrix2 in C++ will also affect cori in R workspace!
+	// cori in RTmp is binded to corr_matrix2 (like a pointer), changing values in corr_matrix2 in C++ will also affect cori in RTmp workspace!
 	corr_matrix2(1,1) = 123;
-	R.parseEvalQ("print(cori)");
+	RTmp.parseEvalQ("print(cori)");
 
 	// end: test for RInside */
 	//////////////////////////////////////////////////////////////////
@@ -800,15 +798,15 @@ double CalcRegionInter(RInside &R, string fout, vector<bool> &pheno, BYTE **geno
 	// Calc and return pmin
 	clock_t st, ed;
 	st = clock();
-	R["numpv"] = plist.size();
-	R["cori"] = corr_matrix;
-	R["minpv"] = *min_element(plist.begin(), plist.end());
+	RTmp["numpv"] = plist.size();
+	RTmp["cori"] = corr_matrix;
+	RTmp["minpv"] = *min_element(plist.begin(), plist.end());
 
-	double pmin = R.parseEval("1-pmvnorm(lower=qnorm(minpv/2),upper=-qnorm(minpv/2),mean=rep(0, numpv),corr=cori)");
+	double pmin = RTmp.parseEval("1-pmvnorm(lower=qnorm(minpv/2),upper=-qnorm(minpv/2),mean=rep(0, numpv),corr=cori)");
 	ed = clock();
 	if (show_message)
 	{
-		printf("cputime for calling R fucntions pmvnorm: %f seconds.\n", (double)(ed - st)/ CLOCKS_PER_SEC);
+		printf("cputime for calling RTmp fucntions pmvnorm: %f seconds.\n", (double)(ed - st)/ CLOCKS_PER_SEC);
 	}
 	return pmin;
 

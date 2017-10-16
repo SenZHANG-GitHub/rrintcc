@@ -24,6 +24,8 @@
 using namespace std;
 
 extern ofstream LOG;
+extern RInside RTmp;
+
 
 ///////////////////////////////////////////
 // Type definitions 
@@ -59,7 +61,7 @@ void GetDataSize(string filename, int **DataSize, int &ndataset_out, bool show_m
 
 void GetData(string filename, int *DataSize, int &n, int &p, int &ncase, int &nctrl, int ndataset, vector<bool> &pheno, BYTE ***geno, double ***geno_bar, bool show_message);
 
-double CalcRegionInter(RInside &R, string fout, vector<bool> &pheno, BYTE **geno, double **geno_bar, vector<int> &snpchr, vector<string> &snpname, bool skip_symm, int p, int n, int ncase, int nctrl, vector<int> &sA, vector<int> &sB, double myth_pgates, double myth_trun, int reps, bool flagperm, int max_cov_cnt, bool show_message);
+double CalcRegionInter(string fout, vector<bool> &pheno, BYTE **geno, double **geno_bar, vector<int> &snpchr, vector<string> &snpname, bool skip_symm, int p, int n, int ncase, int nctrl, vector<int> &sA, vector<int> &sB, double myth_pgates, double myth_trun, int reps, bool flagperm, int max_cov_cnt, bool show_message);
 
 void LDContrastTest(vector<bool> &pheno, vector<double> &zlist, vector<double> &plist, vector<int> &cov_index, BYTE **geno, double **geno_bar, vector<int> &sA, vector<int> &sB, bool skip_symm, int p, int n, int ncase, int nctrl, bool show_message);
 

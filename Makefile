@@ -44,12 +44,12 @@ RINSIDELIBS := 		$(shell echo 'RInside:::LdFlags()'  | $(R_HOME)/bin/R --vanilla
 
 ##########################################################################
 
-OUTPUT = rrintcc_BOOST
+OUTPUT = rrintcc
 
 CXX_FLAGS += -w -I. -m64 --std=c++11 $(shell $(R_HOME)/bin/R CMD config CPPFLAGS) $(RCPPFLAGS) $(RCPPINCL) $(RINSIDEINCL) $(shell $(R_HOME)/bin/R CMD config CXXFLAGS)
 LIB += $(RLDFLAGS) $(RRPATH) $(RBLAS) $(RLAPACK) $(RCPPLIBS) $(RINSIDELIBS)
 
-SRC = rrintcc_BOOST.cpp utility.cpp stats.cpp 
+SRC = rrintcc.cpp utility.cpp stats.cpp 
 HDR = utility.h stats.h
 OBJ = $(SRC:.cpp=.o)
 
